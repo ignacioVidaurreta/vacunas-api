@@ -8,18 +8,27 @@ import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import requests
+
+# THIS DOWNLOADS DATA FROM THE API
+res = requests.get("http://localhost:8000/vaccines/by_state/1")
+api_df = pd.read_json(res.content).T
+
+# We need to cast the ints to np int32 again...
+api_df = api_df.astype({'cant_vacunas': 'int32', 'jurisdiccion_codigo_indec': 'int32'})
 
 df = pd.read_csv("vacunas.csv")
+
 geo = gpd.read_file("provincias_argentinas_polygon.geojson")
 print(geo[:5])
 
 # choropleth map
 fig = px.choropleth(
-    data_frame=df,
+    data_frame=api_df,
     geojson=geo,
     locations="jurisdiccion_codigo_indec",
     featureidkey="properties.c_indec",
-    color="primera_dosis_cantidad",
+    color="cant_vacunas",
     color_continuous_scale="Mint",
 )
 fig.update_geos(
