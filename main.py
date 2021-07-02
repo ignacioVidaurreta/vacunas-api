@@ -20,10 +20,10 @@ vaccine_df = _fetch_data()
 def home():
     return {"Hello": "FastAPI"}
 
-@app.get("/vaccines/by_jurisdiction/{dose_num}")
-def get_vaccines_by_jurisdiction(dose_num: int):
+@app.get("/vaccines/by_state/{dose_num}")
+def get_vaccines_by_state(dose_num: int):
     """
-    Get the vaccine information by jurisdiction of the `{dose_num}` dose
+    Get the vaccine information by state of the `{dose_num}` dose
     """
     if dose_num not in [1,2]:
         return {"Error": f"{dose_num} is not a valid dose number"}
