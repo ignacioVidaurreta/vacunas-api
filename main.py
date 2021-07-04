@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from typing import Optional
 import pandas as pd
 import numpy as np
-import json
-from utils import df_to_json
 # https://towardsdatascience.com/create-your-first-rest-api-in-fastapi-e728ae649a60
 
 def _fetch_data():
