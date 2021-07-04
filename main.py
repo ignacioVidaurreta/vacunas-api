@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from typing import Optional
 import pandas as pd
+import numpy as np
+import json
 from utils import df_to_json
 # https://towardsdatascience.com/create-your-first-rest-api-in-fastapi-e728ae649a60
 
@@ -30,6 +32,33 @@ def get_vaccines_by_state(dose_num: int):
 
     dose_col = "primera_dosis_cantidad" if dose_num == 1 else "segunda_dosis_cantidad"
     return df_to_json(vaccine_df, dose_col)
+
+@app.get("/vaccines/by_date")
+def get_vaccines_by_date():
+    """
+    Get the vaccine information by date. Returns data for every vaccine and both doses.
+    Response Format:
+    An `array` where each element has as array with the following format:
+    ```
+    [date, vaccine_name, dose_num, qty]
+    ```
+    """
+    df = pd.read_csv("dates_vaccines_qty.csv", sep=" ")
+    df = df.assign(acum=pd.Series(np.ones(len(df))))
+    res = df.groupby(by=["fecha_aplicacion", "vacuna", "orden_dosis"])\
+                .sum()\
+                .reset_index()
+
+    response = []
+    for index in range(0, len(res)):
+        tmp_arr = list(res.iloc[index].to_numpy())
+        tmp_arr[2] = int(tmp_arr[2])
+        tmp_arr[3] = int(tmp_arr[3])
+        response.append(tmp_arr)
+
+
+    return response
+
 
 @app.get("/greet/{name}")
 def say_hi(name: str):
