@@ -62,10 +62,21 @@ qty_total = api_qty_df["Cantidad"]["Total"]
 N = 1
 api_qty_df = api_qty_df.iloc[:-N, :]
 
-# api_qty_df["Porcentaje"].copy()
-df2 = pd.DataFrame({"x": api_qty_df.index.copy(), "y": api_qty_df["Porcentaje"].copy()})
 
-# print("DFFF", df2, type(api_qty_df["Porcentaje"][1]))
+df2 = pd.DataFrame(
+    {
+        "name": api_qty_df.index.copy(),
+        "y": api_qty_df["Porcentaje"].copy(),
+        "cant": api_qty_df["Cantidad"].copy(),
+    }
+)
+df2["y"] = pd.Series([round(val, 1) for val in df2["y"]], index=df2.index)
+df2["cant"] = df2.apply(lambda x: "{:,}".format(x["cant"]), axis=1)
+
+df2["x"] = df2["name"].str.split().str[0].str.strip()
+
+print("DFFF", df2)
+
 fig2 = px.bar(
     df2,
     y="y",
@@ -77,7 +88,7 @@ fig2 = px.bar(
 
 fig2.update_traces(
     textposition="outside",
-    hovertemplate="%{x} <br>Porcentaje: %{y}% </br> ",
+    hovertemplate="Vacuna %{x} <br>Porcentaje: %{y}% </br>",
     texttemplate="%{y}%",
     marker_color=["#FFF1E6", "#FAD2E1", "#BEE1E6", "#CDDAFD"],
 )
@@ -91,7 +102,10 @@ fig2.update_layout(
     margin={"r": 0, "t": 10, "l": 0, "b": 0},
     width=450,
 )
-fig2.update_yaxes(visible=False, showticklabels=False)
+fig2.update_yaxes(
+    visible=False,
+    showticklabels=False,
+)
 fig2.update(layout_coloraxis_showscale=False)
 
 
@@ -332,34 +346,23 @@ app.layout = html.Div(
                                 html.Div(
                                     [
                                         html.P(
-                                            children="AstraZeneca",
+                                            children=df2["x"][0],
                                             id="az",
                                             style={"textAlign": "center"},
                                         ),
                                         html.P(
-                                            children="122341",
+                                            children=df2["cant"][0],
                                             style={"textAlign": "center"},
                                         ),
                                     ],
                                     className="mini_container",
-                                    style={"background": "#BEE1E6"},
+                                    style={"background": "#FFF1E6"},
                                 ),
                                 html.Div(
                                     [
-                                        html.P(children="COVISHIELD"),
+                                        html.P(children=df2["x"][1]),
                                         html.P(
-                                            children="1234565",
-                                            style={"textAlign": "center"},
-                                        ),
-                                    ],
-                                    className="mini_container",
-                                    style={"background": "#CDDAFD"},
-                                ),
-                                html.Div(
-                                    [
-                                        html.P(children="Sinopharm"),
-                                        html.P(
-                                            children="12345567",
+                                            children=df2["cant"][1],
                                             style={"textAlign": "center"},
                                         ),
                                     ],
@@ -368,15 +371,25 @@ app.layout = html.Div(
                                 ),
                                 html.Div(
                                     [
-                                        html.P(children="Sputnik V"),
+                                        html.P(children=df2["x"][2]),
                                         html.P(
-                                            children="12345567",
-                                            id="sv",
+                                            children=df2["cant"][2],
                                             style={"textAlign": "center"},
                                         ),
                                     ],
                                     className="mini_container",
-                                    style={"background": "#FFF1E6"},
+                                    style={"background": "#BEE1E6"},
+                                ),
+                                html.Div(
+                                    [
+                                        html.P(children=df2["x"][3]),
+                                        html.P(
+                                            children=df2["cant"][3],
+                                            style={"textAlign": "center"},
+                                        ),
+                                    ],
+                                    className="mini_container",
+                                    style={"background": "#CDDAFD"},
                                 ),
                             ],
                             id="info-container",
