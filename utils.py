@@ -8,13 +8,14 @@ def grab_info_by_state(df, dose_col):
 
     response["headers"] = [
         *list(by_state.columns[0:2].to_numpy()),
-        "cant_vacunas"
+        "poblacion_vacunada_provincia"
     ]
 
     content = []
     for i in range(0, len(by_state)):
         row = list(by_state.iloc[i].to_numpy())
         vac_qty = row[2] if dose_col == "primera_dosis_cantidad" else row[3]
+        #TODO: hay que dividir vac_qty por el número de indec para ver el % de población vacunada
         data = [*row[0:2], vac_qty]
         data[0] = int(data[0])
         data[2] = int(data[2])

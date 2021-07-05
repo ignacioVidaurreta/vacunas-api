@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import requests
 import json
-from locale import atof, setlocale, LC_NUMERIC
 
 # THIS DOWNLOADS DATA FROM THE API
 res = requests.get("http://localhost:8000/vaccines/by_state/1")
@@ -63,7 +62,7 @@ api_qty_df = pd.read_json(res.content)
 
 
 # guardo el total de vacunas
-qty_total = atof(api_qty_df["Cantidad"]["Total"])
+qty_total = api_qty_df["Cantidad"]["Total"]
 
 # elimino el total del df para graficar
 N = 1
@@ -313,7 +312,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [dcc.Graph(id="choropleth", figure=fig2)],
+                    [dcc.Graph(id="choropleth", figure=fig)],
                     className="pretty_container four columns",
                     id="choropleth-map",
                 ),

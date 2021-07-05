@@ -42,11 +42,25 @@ def get_vaccines_qty():
             }
         )
     )
-
     qty["Porcentaje"] = (qty["Cantidad"] / qty["Cantidad"].sum()) * 100
     qty = qty.sort_values(by=["Porcentaje"], ascending=False)
     qty.loc["Total"] = qty.sum()
     return qty
+
+@app.get("/vaccines/doses")
+def get_number_vaccines_per_dose():
+    """
+    Get the number of doses for first and second doses of vaccines
+    """
+    total_poblacion = 45.808.747 #TODO: no levantar de dataframe
+    prim_dosis = sum(vaccine_df["primera_dosis_cantidad"])
+    sec_dosis = sum(vaccine_df["segunda_dosis_cantidad"])
+    aux =  {
+       'primera dosis':  prim_dosis,
+       'segunda dosis':  sec_dosis,
+       'total_sin_vacunar': total_poblacion - prim_dosis - sec_dosis,
+    }
+    return aux
 
 
 @app.get("/vaccines/by_state/{dose_num}")
