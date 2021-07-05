@@ -1,7 +1,6 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import geopandas as gpd
@@ -11,49 +10,62 @@ import plotly.graph_objects as go
 import requests
 
 # THIS DOWNLOADS DATA FROM THE API
-res = requests.get("http://localhost:8000/vaccines/by_state/1")
-api_df = pd.read_json(res.content).T
+# res = requests.get("http://localhost:8000/vaccines/by_state/1")
+# api_df = pd.read_json(res.content).T
 
-# We need to cast the ints to np int32 again...
-api_df = api_df.astype({'cant_vacunas': 'int32', 'jurisdiccion_codigo_indec': 'int32'})
+# # We need to cast the ints to np int32 again...
+# api_df = api_df.astype({"cant_vacunas": "int32", "jurisdiccion_codigo_indec": "int32"})
 
-df = pd.read_csv("vacunas.csv")
+# df = pd.read_csv("vacunas.csv")
 
-geo = gpd.read_file("provincias_argentinas_polygon.geojson")
-print(geo[:5])
+# geo = gpd.read_file("provincias_argentinas_polygon.geojson")
+# print(geo[:5])
 
-# choropleth map
-fig = px.choropleth(
-    data_frame=api_df,
-    geojson=geo,
-    locations="jurisdiccion_codigo_indec",
-    featureidkey="properties.c_indec",
-    color="cant_vacunas",
-    color_continuous_scale="Mint",
-)
-fig.update_geos(
-    showcountries=False,
-    showcoastlines=False,
-    showland=False,
-    fitbounds="locations",
-    visible=False,
-    lataxis_range=[0, 0],
-    projection={"type": "natural earth"},
-)
-fig.update_layout(
-    # margin={"r": 0, "t": 0, "l": 0, "b": 0},
-    plot_bgcolor="rgba(0, 0, 0, 0)",
-    paper_bgcolor="rgba(0, 0, 0, 0)",
-    margin=dict(t=0, r=0, l=0),
-    height=650,
-    geo=dict(bgcolor="rgba(0,0,0,0)"),
-)
+# # choropleth map
+# fig = px.choropleth(
+#     data_frame=api_df,
+#     geojson=geo,
+#     locations="jurisdiccion_codigo_indec",
+#     featureidkey="properties.c_indec",
+#     color="cant_vacunas",
+#     color_continuous_scale="Mint",
+# )
+# fig.update_geos(
+#     showcountries=False,
+#     showcoastlines=False,
+#     showland=False,
+#     fitbounds="locations",
+#     visible=False,
+#     lataxis_range=[0, 0],
+#     projection={"type": "natural earth"},
+# )
+# fig.update_layout(
+#     # margin={"r": 0, "t": 0, "l": 0, "b": 0},
+#     plot_bgcolor="rgba(0, 0, 0, 0)",
+#     paper_bgcolor="rgba(0, 0, 0, 0)",
+#     margin=dict(t=0, r=0, l=0),
+#     height=650,
+#     geo=dict(bgcolor="rgba(0,0,0,0)"),
+# )
 
 
 # barchart porcentaje vacunas
-vac = ["Sputkin", "Sino", "Astra", "CoviShield"]
-porc = [50, 30, 20, 10]
-df2 = pd.DataFrame({"x": vac, "y": porc})
+# Get Data
+res = requests.get("http://localhost:8000/vaccines/qty")
+api_qty_df = pd.read_json(res.content)
+
+
+# guardo el total de vacunas
+qty_total = api_qty_df["Cantidad"]["Total"]
+
+# elimino el total del df para graficar
+N = 1
+api_qty_df = api_qty_df.iloc[:-N, :]
+
+# api_qty_df["Porcentaje"].copy()
+df2 = pd.DataFrame({"x": api_qty_df.index.copy(), "y": api_qty_df["Porcentaje"].copy()})
+
+# print("DFFF", df2, type(api_qty_df["Porcentaje"][1]))
 fig2 = px.bar(
     df2,
     y="y",
@@ -219,6 +231,7 @@ fig3.update_layout(annotations=annotations)
 
 
 # line chart dates
+
 data = {
     "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
     "Total": [45, 65, 75, 73],
@@ -228,10 +241,8 @@ data = {
     "Shiel": [5, 15, 7, 10],
 }
 
-df = px.data.stocks()
 df4 = pd.DataFrame(data)
-print(df)
-print(df4)
+
 fig4 = px.line(
     df4,
     x="Date",
@@ -281,7 +292,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [dcc.Graph(id="choropleth", figure=fig)],
+                    [dcc.Graph(id="choropleth", figure=fig2)],
                     className="pretty_container four columns",
                     id="choropleth-map",
                 ),
@@ -305,7 +316,26 @@ app.layout = html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.P(children="AstraZeneca", id="az"),
+                                        html.P(
+                                            children="Total",
+                                            id="tot",
+                                            style={"textAlign": "center"},
+                                        ),
+                                        html.P(
+                                            children=qty_total,
+                                            style={"textAlign": "center"},
+                                        ),
+                                    ],
+                                    className="mini_container",
+                                    style={"background": "grey"},
+                                ),
+                                html.Div(
+                                    [
+                                        html.P(
+                                            children="AstraZeneca",
+                                            id="az",
+                                            style={"textAlign": "center"},
+                                        ),
                                         html.P(
                                             children="122341",
                                             style={"textAlign": "center"},
