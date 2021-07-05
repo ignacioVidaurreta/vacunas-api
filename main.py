@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from typing import Optional
 import pandas as pd
 import numpy as np
+from utils import grab_info_by_state
 
 # https://towardsdatascience.com/create-your-first-rest-api-in-fastapi-e728ae649a60
 
@@ -57,7 +58,7 @@ def get_vaccines_by_state(dose_num: int):
         return {"Error": f"{dose_num} is not a valid dose number"}
 
     dose_col = "primera_dosis_cantidad" if dose_num == 1 else "segunda_dosis_cantidad"
-    return df_to_json(vaccine_df, dose_col)
+    return grab_info_by_state(vaccine_df, dose_col)
 
 
 @app.get("/vaccines/by_date")

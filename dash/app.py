@@ -8,45 +8,51 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import requests
+import json
 
 # THIS DOWNLOADS DATA FROM THE API
-# res = requests.get("http://localhost:8000/vaccines/by_state/1")
-# api_df = pd.read_json(res.content).T
+res = requests.get("http://localhost:8000/vaccines/by_state/1")
+data = json.loads(res.content)
+vac_df = pd.DataFrame(
+    data=data["content"],
+    index=range(0, len(data["content"])),
+    columns=data["headers"]
+)
 
-# # We need to cast the ints to np int32 again...
-# api_df = api_df.astype({"cant_vacunas": "int32", "jurisdiccion_codigo_indec": "int32"})
+# We need to cast the ints to np int32 again...
+vac_df = vac_df.astype({"cant_vacunas": "int32", "jurisdiccion_codigo_indec": "int32"})
 
 # df = pd.read_csv("vacunas.csv")
 
-# geo = gpd.read_file("provincias_argentinas_polygon.geojson")
+geo = gpd.read_file("provincias_argentinas_polygon.geojson")
 # print(geo[:5])
 
-# # choropleth map
-# fig = px.choropleth(
-#     data_frame=api_df,
-#     geojson=geo,
-#     locations="jurisdiccion_codigo_indec",
-#     featureidkey="properties.c_indec",
-#     color="cant_vacunas",
-#     color_continuous_scale="Mint",
-# )
-# fig.update_geos(
-#     showcountries=False,
-#     showcoastlines=False,
-#     showland=False,
-#     fitbounds="locations",
-#     visible=False,
-#     lataxis_range=[0, 0],
-#     projection={"type": "natural earth"},
-# )
-# fig.update_layout(
-#     # margin={"r": 0, "t": 0, "l": 0, "b": 0},
-#     plot_bgcolor="rgba(0, 0, 0, 0)",
-#     paper_bgcolor="rgba(0, 0, 0, 0)",
-#     margin=dict(t=0, r=0, l=0),
-#     height=650,
-#     geo=dict(bgcolor="rgba(0,0,0,0)"),
-# )
+# choropleth map
+fig = px.choropleth(
+    data_frame=vac_df,
+    geojson=geo,
+    locations="jurisdiccion_codigo_indec",
+    featureidkey="properties.c_indec",
+    color="cant_vacunas",
+    color_continuous_scale="Mint",
+)
+fig.update_geos(
+    showcountries=False,
+    showcoastlines=False,
+    showland=False,
+    fitbounds="locations",
+    visible=False,
+    lataxis_range=[0, 0],
+    projection={"type": "natural earth"},
+)
+fig.update_layout(
+    # margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    plot_bgcolor="rgba(0, 0, 0, 0)",
+    paper_bgcolor="rgba(0, 0, 0, 0)",
+    margin=dict(t=0, r=0, l=0),
+    height=650,
+    geo=dict(bgcolor="rgba(0,0,0,0)"),
+)
 
 
 # barchart porcentaje vacunas
