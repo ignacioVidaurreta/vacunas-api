@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import requests
+from locale import atof, setlocale, LC_NUMERIC
 
 # THIS DOWNLOADS DATA FROM THE API
 # res = requests.get("http://localhost:8000/vaccines/by_state/1")
@@ -56,7 +57,7 @@ api_qty_df = pd.read_json(res.content)
 
 
 # guardo el total de vacunas
-qty_total = api_qty_df["Cantidad"]["Total"]
+qty_total = atof(api_qty_df["Cantidad"]["Total"])
 
 # elimino el total del df para graficar
 N = 1
@@ -315,7 +316,7 @@ app.layout = html.Div(
                         html.Div(
                             html.Div(
                                 html.P(
-                                    children="Aplicaciónes por vacuna en el Pais",
+                                    children="Aplicaciones por vacuna en el Pais",
                                 ),
                                 id="tittle",
                                 className="row container-display",
