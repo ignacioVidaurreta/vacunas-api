@@ -8,8 +8,12 @@ pip install -r requirements.txt
 
 ## Run the server
 
-### Locally
+```shell
+./run.sh
+```
+
+## Stop the server
 
 ```shell
-uvicorn main:app --reload
+./shutdown.sh
 ```
