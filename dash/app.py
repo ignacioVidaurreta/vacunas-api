@@ -294,13 +294,13 @@ data = {
 }
 
 # df4 = pd.DataFrame(data)
-df4["fecha aplicacion"] = df4[df4["fecha aplicacion"] != "S.I."]
-print(df4)
+df4["fecha_aplicacion"] = df4[df4["fecha_aplicacion"] != "S.I."]
+#print(df4)
 fig4 = px.line(
-    df4.sort_values(by="fecha aplicacion"),
-    x="fecha aplicacion",
+    df4.sort_values(by="fecha_aplicacion"),
+    x="fecha_aplicacion",
     y=df4.columns,
-    hover_data={"fecha aplicacion": "|%B %d, %Y"},
+    hover_data={"fecha_aplicacion": "|%B %d, %Y"},
     color="vacuna",
     color_discrete_map={
         "Sinopharm": "#FAD2E1",

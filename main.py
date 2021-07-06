@@ -60,7 +60,7 @@ def get_number_vaccines_per_dose():
         "segunda_dosis": int(sec_dosis),
         "total_sin_vacunar": int(total_poblacion - prim_dosis - sec_dosis),
     }
-    return json.dumps(aux)
+    return aux
 
 
 @app.get("/vaccines/by_state/{dose_num}")

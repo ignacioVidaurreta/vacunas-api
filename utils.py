@@ -41,8 +41,6 @@ def grab_info_by_state(df, dose_col):
     content = []
     for i in range(0, len(by_state)):
         row = list(by_state.iloc[i].to_numpy())
-        print(row)
-        print(str(row[0]))
         vac_qty = row[2] if dose_col == "primera_dosis_cantidad" else row[3]
         vac_qty /=  poblaciones_provincias[str(row[0])]
         data = [*row[0:2], vac_qty]
