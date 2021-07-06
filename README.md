@@ -13,15 +13,3 @@ pip install -r requirements.txt
 ```shell
 uvicorn main:app --reload
 ```
-
-### Building docker image
-
-```shell
-docker build -t infovis-api .
-```
-
-### Running docker container
-
-```shell
-docker run --rm -it -v $PWD:/src --network host infovis-api
-```
