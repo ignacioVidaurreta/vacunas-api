@@ -286,20 +286,13 @@ data = {
 }
 
 # df4 = pd.DataFrame(data)
-df4['vacuna'] = df4['vacuna'].astype('|S')
-df4['cantidad'] = df4['cantidad'].astype('int')
+df4["fecha aplicacion"] = df4[df4["fecha aplicacion"] != "S.I."]
 fig4 = px.line(
-    df4,
+    df4.sort_values(by="fecha aplicacion"),
     x="fecha aplicacion",
     y="cantidad",
     hover_data={"fecha aplicacion": "|%B %d, %Y"},
-    color_discrete_map={
-        "Total": "grey",
-        "Sinopharm": "#FAD2E1",
-        "AstraZeneca": "#BEE1E6",
-        "COVISHIELD": "#CDDAFD",
-        "Sputnik": "#FFF1E6",
-    },
+    color="vacuna"
 )
 fig4.update_xaxes(dtick="M1", tickformat="%d %B %Y")
 fig4.update_traces(mode="markers+lines", hovertemplate=None, line=dict(width=3))
