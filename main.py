@@ -74,6 +74,7 @@ def get_vaccines_qty():
     qty.loc["Total"] = qty.sum()
     return qty
 
+
 @app.get("/vaccines/doses")
 def get_number_vaccines_per_dose():
     """
@@ -82,12 +83,12 @@ def get_number_vaccines_per_dose():
     total_poblacion = 45808747 #TODO: no levantar de dataframe
     prim_dosis = sum(vaccine_df["primera_dosis_cantidad"])
     sec_dosis = sum(vaccine_df["segunda_dosis_cantidad"])
-    aux =  {
-       'primera dosis':  prim_dosis,
-       'segunda dosis':  sec_dosis,
-       'total_sin_vacunar': total_poblacion - prim_dosis - sec_dosis,
+    aux = {
+        "primera_dosis": int(prim_dosis),
+        "segunda_dosis": int(sec_dosis),
+        "total_sin_vacunar": int(total_poblacion - prim_dosis - sec_dosis),
     }
-    return json.dump(aux)
+    return json.dumps(aux)
 
 
 @app.get("/vaccines/by_state/{dose_num}")
@@ -112,19 +113,17 @@ def get_vaccines_by_date():
     [date, vaccine_name, dose_num, qty]
     ```
     """
-    df = pd.read_csv("dates_vaccines_qty.csv", sep=" ")
-    df = df.assign(acum=pd.Series(np.ones(len(df))))
-    res = (
-        df.groupby(by=["fecha_aplicacion", "vacuna", "orden_dosis"]).sum().reset_index()
-    )
+    df = pd.read_csv("dates_vaccines_qty.csv")
 
-    response = []
-    for index in range(0, len(res)):
-        tmp_arr = list(res.iloc[index].to_numpy())
+    response = dict()
+    response["header"] = list(df.columns.to_numpy())
+    data = []
+    for index in range(0, len(df)):
+        tmp_arr = list(df.iloc[index].to_numpy())
         tmp_arr[2] = int(tmp_arr[2])
-        tmp_arr[3] = int(tmp_arr[3])
-        response.append(tmp_arr)
+        data.append(tmp_arr)
 
+    response["content"] = data
     return response
 
 

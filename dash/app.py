@@ -1,6 +1,8 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from pandas.core.indexes import api
+from pandas.core.indexes.base import Index
 import plotly.express as px
 import pandas as pd
 import geopandas as gpd
@@ -10,17 +12,22 @@ import plotly.graph_objects as go
 import requests
 import json
 
+#################
+##### MAPA ######
+#################
+
 # THIS DOWNLOADS DATA FROM THE API
 res = requests.get("http://localhost:8000/vaccines/by_state/1")
 data = json.loads(res.content)
 vac_df = pd.DataFrame(
-    data=data["content"],
-    index=range(0, len(data["content"])),
-    columns=data["headers"]
+    data=data["content"], index=range(0, len(data["content"])), columns=data["headers"]
 )
 
 # We need to cast the ints to np int32 again...
-vac_df = vac_df.astype({"cant_vacunas": "int32", "jurisdiccion_codigo_indec": "int32"})
+# import ipdb; ipdb.set_trace()
+vac_df = vac_df.astype(
+    {"poblacion_vacunada_provincia": "int32", "jurisdiccion_codigo_indec": "int32"}
+)
 
 # df = pd.read_csv("vacunas.csv")
 
@@ -33,7 +40,7 @@ fig = px.choropleth(
     geojson=geo,
     locations="jurisdiccion_codigo_indec",
     featureidkey="properties.c_indec",
-    color="cant_vacunas",
+    color="poblacion_vacunada_provincia",
     color_continuous_scale="Mint",
 )
 fig.update_geos(
@@ -54,8 +61,9 @@ fig.update_layout(
     geo=dict(bgcolor="rgba(0,0,0,0)"),
 )
 
-
-# barchart porcentaje vacunas
+###############################
+# barchart porcentaje vacunas #
+###############################
 # Get Data
 res = requests.get("http://localhost:8000/vaccines/qty")
 api_qty_df = pd.read_json(res.content)
@@ -81,7 +89,6 @@ df2["cant"] = df2.apply(lambda x: "{:,}".format(x["cant"]), axis=1)
 
 df2["x"] = df2["name"].str.split().str[0].str.strip()
 
-print("DFFF", df2)
 
 fig2 = px.bar(
     df2,
@@ -114,8 +121,20 @@ fig2.update_yaxes(
 )
 fig2.update(layout_coloraxis_showscale=False)
 
+########################
+# Horizontal Bar chart #
+########################
 
-# Horizontal Bar chart
+res4 = requests.get("http://localhost:8000/vaccines/doses")
+api_dose_df = json.loads((res4.content))
+aux = pd.DataFrame.from_dict(api_dose_df, orient="index", columns=["Cantidad"])
+total_poblacion = 45808747  # TODO: no levantar de dataframe
+
+aux["Porcentaje"] = pd.Series(
+    ["{0:.2f}".format(val / total_poblacion * 100) for val in aux["Cantidad"]],
+    index=aux.index,
+)
+aux["Porcentaje"] = aux["Porcentaje"].astype(float)
 
 top_labels = [
     "2 Dosis",
@@ -129,8 +148,13 @@ colors = [
     "rgba(142, 140, 171, 0.8)",
 ]
 
+
 x_data = [
-    [10, 20, 70],
+    [
+        aux["Porcentaje"][1],
+        aux["Porcentaje"][0],
+        aux["Porcentaje"][2],
+    ],
 ]
 
 y_data = [
@@ -249,8 +273,16 @@ for yd, xd in zip(y_data, x_data):
 
 fig3.update_layout(annotations=annotations)
 
-
-# line chart dates
+####################
+# line chart dates #
+####################
+res4 = requests.get("http://localhost:8000/vaccines/by_date")
+data4 = json.loads(res4.content)
+df4 = pd.DataFrame(
+    data=data4["content"],
+    index=range(0, len(data4["content"])),
+    columns=data4["header"],
+)
 
 data = {
     "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
@@ -261,23 +293,24 @@ data = {
     "Shiel": [5, 15, 7, 10],
 }
 
-df4 = pd.DataFrame(data)
-
+# df4 = pd.DataFrame(data)
+df4["fecha aplicacion"] = df4[df4["fecha aplicacion"] != "S.I."]
+print(df4)
 fig4 = px.line(
-    df4,
-    x="Date",
+    df4.sort_values(by="fecha aplicacion"),
+    x="fecha aplicacion",
     y=df4.columns,
-    hover_data={"Date": "|%B %d, %Y"},
+    hover_data={"fecha aplicacion": "|%B %d, %Y"},
+    color="vacuna",
     color_discrete_map={
-        "Total": "grey",
-        "Sino": "#FAD2E1",
-        "Aztra": "#BEE1E6",
-        "Shiel": "#CDDAFD",
-        "Sputnik": "#FFF1E6",
+        "Sinopharm": "#FAD2E1",
+        "AstraZeneca": "#BEE1E6",
+        "COVISHIELD": "#CDDAFD",
+        "Sputnik": "#ebd3ca",
     },
 )
-fig4.update_xaxes(dtick="M1", tickformat="%d %B %Y")
-fig4.update_traces(mode="markers+lines", hovertemplate=None, line=dict(width=3))
+fig4.update_xaxes(dtick="M1", tickformat="%B'\n'%Y")
+fig4.update_traces(mode="markers+lines", hovertemplate=None, line=dict(width=2))
 fig4.update_layout(
     hovermode="x unified",
     plot_bgcolor="rgba(0, 0, 0, 0)",
@@ -453,26 +486,7 @@ app.layout = html.Div(
                 ),
             ],
             className="pretty_container  columns",
-            style={"width": "50%"},
-        ),
-        html.Div(
-            [
-                html.Div(
-                    html.P(
-                        children="Final",
-                        className="header-description",
-                    ),
-                    className="pretty_container seven columns",
-                ),
-                html.Div(
-                    html.P(
-                        children="Final",
-                        className="header-description",
-                    ),
-                    className="pretty_container five columns",
-                ),
-            ],
-            className="row flex-display",
+            style={"width": "100%"},
         ),
     ],
     id="mainContainer",
