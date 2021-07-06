@@ -89,21 +89,13 @@ def get_vaccines_by_date():
     ```
     """
     df = pd.read_csv("dates_vaccines_qty.csv")
-    df = df.assign(acum=pd.Series(np.ones(len(df))))
-    res = df.groupby(
-            by=["fecha aplicacion", "vacuna", "orden_dosis"]
-        ).sum()\
-        .reset_index()\
-        .rename(columns={'acum':'total'})
-
 
     response = dict()
-    response["header"] = list(res.columns.to_numpy())
+    response["header"] = list(df.columns.to_numpy())
     data = []
-    for index in range(0, len(res)):
-        tmp_arr = list(res.iloc[index].to_numpy())
+    for index in range(0, len(df)):
+        tmp_arr = list(df.iloc[index].to_numpy())
         tmp_arr[2] = int(tmp_arr[2])
-        tmp_arr[3] = int(tmp_arr[3])
         data.append(tmp_arr)
 
     response["content"] = data

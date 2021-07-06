@@ -20,7 +20,8 @@ vac_df = pd.DataFrame(
 )
 
 # We need to cast the ints to np int32 again...
-vac_df = vac_df.astype({"cant_vacunas": "int32", "jurisdiccion_codigo_indec": "int32"})
+# import ipdb; ipdb.set_trace()
+vac_df = vac_df.astype({"poblacion_vacunada_provincia": "int32", "jurisdiccion_codigo_indec": "int32"})
 
 # df = pd.read_csv("vacunas.csv")
 
@@ -33,7 +34,7 @@ fig = px.choropleth(
     geojson=geo,
     locations="jurisdiccion_codigo_indec",
     featureidkey="properties.c_indec",
-    color="cant_vacunas",
+    color="poblacion_vacunada_provincia",
     color_continuous_scale="Mint",
 )
 fig.update_geos(
@@ -268,13 +269,12 @@ fig3.update_layout(annotations=annotations)
 
 
 # line chart dates
-# res4 = requests.get("http://localhost:8000/vaccines/by_date")
-# data4 = json.loads(res4.content)
-# print("data", res4.content)
+res4 = requests.get("http://localhost:8000/vaccines/by_date")
+data4 = json.loads(res4.content)
 
-# vac_df = pd.DataFrame(
-#     data=data["content"], index=range(0, len(data["content"])), columns=data["headers"]
-# )
+df4 = pd.DataFrame(
+    data=data4["content"], index=range(0, len(data4["content"])), columns=data4["header"]
+)
 
 data = {
     "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
@@ -285,20 +285,21 @@ data = {
     "Shiel": [5, 15, 7, 10],
 }
 
-df4 = pd.DataFrame(data)
-
+# df4 = pd.DataFrame(data)
+df4['vacuna'] = df4['vacuna'].astype('|S')
+df4['cantidad'] = df4['cantidad'].astype('int')
 fig4 = px.line(
     df4,
-    x="Date",
+    x="fecha aplicacion",
     y=df4.columns,
-    hover_data={"Date": "|%B %d, %Y"},
-    color_discrete_map={
-        "Total": "grey",
-        "Sino": "#FAD2E1",
-        "Aztra": "#BEE1E6",
-        "Shiel": "#CDDAFD",
-        "Sputnik": "#FFF1E6",
-    },
+    hover_data={"fecha aplicacion": "|%B %d, %Y"},
+    # color_discrete_map={
+    #     "Total": "grey",
+    #     "Sinopharm": "#FAD2E1",
+    #     "AstraZeneca": "#BEE1E6",
+    #     "COVISHIELD": "#CDDAFD",
+    #     "Sputnik": "#FFF1E6",
+    # },
 )
 fig4.update_xaxes(dtick="M1", tickformat="%d %B %Y")
 fig4.update_traces(mode="markers+lines", hovertemplate=None, line=dict(width=3))
