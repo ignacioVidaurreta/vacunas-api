@@ -9,6 +9,7 @@ import json
 
 # TODO: ultima atualizacion de los datos!!
 
+
 def _fetch_data():
     print("Reading vaccine information")
     url = "https://sisa.msal.gov.ar/datos/descargas/covid-19/files/Covid19VacunasAgrupadas.csv.zip"
@@ -17,14 +18,33 @@ def _fetch_data():
     return df
 
 
+def fetch_recepcion_de_vacunas():
+    print("Reading reception data")
+    url = "http://datos.salud.gob.ar/dataset/7e69d4b4-535d-4d4d-ad4a-362b6a1f4468/resource/d2851fa6-b105-4f15-b352-dd3d792bd526/download/2021-06-29-actas-de-recepcion-vacunas.xlsx"
+    df = pd.read_excel(url)
+    print("FInish Reading")
+    return df
+
+
 app = FastAPI()
 
 vaccine_df = _fetch_data()
+vaccine_reception = fetch_recepcion_de_vacunas()
 
 
 @app.get("/")
 def home():
     return {"Hello": "FastAPI"}
+
+
+@app.get("/vaccines/reception_qty")
+def get_reception_vaccines_qty():
+    """
+    Get number of vaccines that arrived in the country
+    """
+    qty = vaccine_reception["dosis_recibidas"].sum()
+    aux = {"dosis_recibidas": int(qty)}
+    return aux
 
 
 @app.get("/vaccines/qty")
