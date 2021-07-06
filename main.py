@@ -3,6 +3,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 from utils import grab_info_by_state
+import json
 
 # https://towardsdatascience.com/create-your-first-rest-api-in-fastapi-e728ae649a60
 
@@ -47,6 +48,7 @@ def get_vaccines_qty():
     qty.loc["Total"] = qty.sum()
     return qty
 
+
 @app.get("/vaccines/doses")
 def get_number_vaccines_per_dose():
     """
@@ -55,11 +57,12 @@ def get_number_vaccines_per_dose():
     total_poblacion = 45808747 #TODO: no levantar de dataframe
     prim_dosis = sum(vaccine_df["primera_dosis_cantidad"])
     sec_dosis = sum(vaccine_df["segunda_dosis_cantidad"])
-    aux =  {
-       'primera dosis':  prim_dosis,
-       'segunda dosis':  sec_dosis,
-       'total_sin_vacunar': total_poblacion - prim_dosis - sec_dosis,
+    aux = {
+        "primera_dosis": int(prim_dosis),
+        "segunda_dosis": int(sec_dosis),
+        "total_sin_vacunar": int(total_poblacion - prim_dosis - sec_dosis),
     }
+
     return aux
 
 

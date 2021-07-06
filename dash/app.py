@@ -1,6 +1,8 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from pandas.core.indexes import api
+from pandas.core.indexes.base import Index
 import plotly.express as px
 import pandas as pd
 import geopandas as gpd
@@ -14,9 +16,7 @@ import json
 res = requests.get("http://localhost:8000/vaccines/by_state/1")
 data = json.loads(res.content)
 vac_df = pd.DataFrame(
-    data=data["content"],
-    index=range(0, len(data["content"])),
-    columns=data["headers"]
+    data=data["content"], index=range(0, len(data["content"])), columns=data["headers"]
 )
 
 # We need to cast the ints to np int32 again...
@@ -54,8 +54,9 @@ fig.update_layout(
     geo=dict(bgcolor="rgba(0,0,0,0)"),
 )
 
-
-# barchart porcentaje vacunas
+###############################
+# barchart porcentaje vacunas #
+###############################
 # Get Data
 res = requests.get("http://localhost:8000/vaccines/qty")
 api_qty_df = pd.read_json(res.content)
@@ -81,7 +82,6 @@ df2["cant"] = df2.apply(lambda x: "{:,}".format(x["cant"]), axis=1)
 
 df2["x"] = df2["name"].str.split().str[0].str.strip()
 
-print("DFFF", df2)
 
 fig2 = px.bar(
     df2,
@@ -114,8 +114,20 @@ fig2.update_yaxes(
 )
 fig2.update(layout_coloraxis_showscale=False)
 
+########################
+# Horizontal Bar chart #
+########################
 
-# Horizontal Bar chart
+res4 = requests.get("http://localhost:8000/vaccines/doses")
+api_dose_df = json.loads((res4.content))
+aux = pd.DataFrame.from_dict(api_dose_df, orient="index", columns=["Cantidad"])
+total_poblacion = 45808747  # TODO: no levantar de dataframe
+
+aux["Porcentaje"] = pd.Series(
+    ["{0:.2f}".format(val / total_poblacion * 100) for val in aux["Cantidad"]],
+    index=aux.index,
+)
+aux["Porcentaje"] = aux["Porcentaje"].astype(float)
 
 top_labels = [
     "2 Dosis",
@@ -129,8 +141,13 @@ colors = [
     "rgba(142, 140, 171, 0.8)",
 ]
 
+
 x_data = [
-    [10, 20, 70],
+    [
+        aux["Porcentaje"][1],
+        aux["Porcentaje"][0],
+        aux["Porcentaje"][2],
+    ],
 ]
 
 y_data = [
@@ -251,6 +268,13 @@ fig3.update_layout(annotations=annotations)
 
 
 # line chart dates
+# res4 = requests.get("http://localhost:8000/vaccines/by_date")
+# data4 = json.loads(res4.content)
+# print("data", res4.content)
+
+# vac_df = pd.DataFrame(
+#     data=data["content"], index=range(0, len(data["content"])), columns=data["headers"]
+# )
 
 data = {
     "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
@@ -312,7 +336,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [dcc.Graph(id="choropleth", figure=fig)],
+                    [dcc.Graph(id="choropleth", figure=fig2)],
                     className="pretty_container four columns",
                     id="choropleth-map",
                 ),
