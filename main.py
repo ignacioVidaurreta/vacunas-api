@@ -52,7 +52,7 @@ def get_number_vaccines_per_dose():
     """
     Get the number of doses for first and second doses of vaccines
     """
-    total_poblacion = 45.808.747 #TODO: no levantar de dataframe
+    total_poblacion = 45808747 #TODO: no levantar de dataframe
     prim_dosis = sum(vaccine_df["primera_dosis_cantidad"])
     sec_dosis = sum(vaccine_df["segunda_dosis_cantidad"])
     aux =  {
@@ -85,19 +85,25 @@ def get_vaccines_by_date():
     [date, vaccine_name, dose_num, qty]
     ```
     """
-    df = pd.read_csv("dates_vaccines_qty.csv", sep=" ")
+    df = pd.read_csv("dates_vaccines_qty.csv")
     df = df.assign(acum=pd.Series(np.ones(len(df))))
-    res = (
-        df.groupby(by=["fecha_aplicacion", "vacuna", "orden_dosis"]).sum().reset_index()
-    )
+    res = df.groupby(
+            by=["fecha aplicacion", "vacuna", "orden_dosis"]
+        ).sum()\
+        .reset_index()\
+        .rename(columns={'acum':'total'})
 
-    response = []
+
+    response = dict()
+    response["header"] = list(res.columns.to_numpy())
+    data = []
     for index in range(0, len(res)):
         tmp_arr = list(res.iloc[index].to_numpy())
         tmp_arr[2] = int(tmp_arr[2])
         tmp_arr[3] = int(tmp_arr[3])
-        response.append(tmp_arr)
+        data.append(tmp_arr)
 
+    response["content"] = data
     return response
 
 
