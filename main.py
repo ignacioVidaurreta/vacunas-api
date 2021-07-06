@@ -9,34 +9,6 @@ import json
 
 # TODO: ultima atualizacion de los datos!!
 
-poblaciones_provincias = {
-    '02': 3078836,
-    '06': 17709598,
-    '10': 418991,
-    '14': 3798261,
-    '18': 1130320,
-    '22': 1216247,
-    '26': 629181,
-    '30': 1398510,
-    '34': 610019,
-    '38': 779212,
-    '42': 779212,
-    '46': 398648,
-    '50': 2010363,
-    '51': 1274992,
-    '58': 1274992,
-    '62': 757052,
-    '66': 1441988,
-    '70': 789489,
-    '74': 514610,
-    '78': 374756,
-    '82': 3563390,
-    '86': 988245,
-    '90': 1714487,
-    '94': 177.697
-}
-
-
 def _fetch_data():
     print("Reading vaccine information")
     url = "https://sisa.msal.gov.ar/datos/descargas/covid-19/files/Covid19VacunasAgrupadas.csv.zip"
@@ -80,7 +52,7 @@ def get_number_vaccines_per_dose():
     """
     Get the number of doses for first and second doses of vaccines
     """
-    total_poblacion = 45808747 #TODO: no levantar de dataframe
+    total_poblacion = 45808747
     prim_dosis = sum(vaccine_df["primera_dosis_cantidad"])
     sec_dosis = sum(vaccine_df["segunda_dosis_cantidad"])
     aux = {
