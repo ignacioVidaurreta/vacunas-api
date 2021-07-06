@@ -32,7 +32,6 @@ vac_df = vac_df.astype(
 # df = pd.read_csv("vacunas.csv")
 
 geo = gpd.read_file("provincias_argentinas_polygon.geojson")
-# print(geo[:5])
 
 # choropleth map
 fig = px.choropleth(
@@ -284,18 +283,7 @@ df4 = pd.DataFrame(
     columns=data4["header"],
 )
 
-data = {
-    "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
-    "Total": [45, 65, 75, 73],
-    "Sputnik": [10, 20, 30, 30],
-    "Aztra": [10, 10, 15, 13],
-    "Sino": [20, 20, 23, 25],
-    "Shiel": [5, 15, 7, 10],
-}
-
-# df4 = pd.DataFrame(data)
 df4["fecha aplicacion"] = df4[df4["fecha aplicacion"] != "S.I."]
-print(df4)
 fig4 = px.line(
     df4.sort_values(by="fecha aplicacion"),
     x="fecha aplicacion",
@@ -309,7 +297,7 @@ fig4 = px.line(
         "Sputnik": "#ebd3ca",
     },
 )
-fig4.update_xaxes(dtick="M1", tickformat="%B'\n'%Y")
+fig4.update_xaxes(dtick="M1", tickformat="%B\n%Y")
 fig4.update_traces(mode="markers+lines", hovertemplate=None, line=dict(width=2))
 fig4.update_layout(
     hovermode="x unified",
