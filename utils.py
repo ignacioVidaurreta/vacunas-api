@@ -1,6 +1,6 @@
 poblaciones_provincias = {
-    '02': 3078836,
-    '06': 17709598,
+    '2': 3078836,
+    '6': 17709598,
     '10': 418991,
     '14': 3798261,
     '18': 1130320,
@@ -12,8 +12,8 @@ poblaciones_provincias = {
     '42': 779212,
     '46': 398648,
     '50': 2010363,
-    '51': 1274992,
-    '58': 1274992,
+    '54': 1274992,
+    '58': 672.461,
     '62': 757052,
     '66': 1441988,
     '70': 789489,
@@ -41,8 +41,10 @@ def grab_info_by_state(df, dose_col):
     content = []
     for i in range(0, len(by_state)):
         row = list(by_state.iloc[i].to_numpy())
+        print(row)
+        print(str(row[0]))
         vac_qty = row[2] if dose_col == "primera_dosis_cantidad" else row[3]
-        vac_qty /=  poblaciones_provincias[row[0]]
+        vac_qty /=  poblaciones_provincias[str(row[0])]
         data = [*row[0:2], vac_qty]
         data[0] = int(data[0])
         data[2] = int(data[2])
