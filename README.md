@@ -17,3 +17,7 @@ pip install -r requirements.txt
 ```shell
 ./shutdown.sh
 ```
+
+## Documentación (Swagger)
+
+Simplemente ir a localhost:8000/docs
