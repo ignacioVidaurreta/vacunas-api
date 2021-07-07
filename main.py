@@ -6,8 +6,8 @@ from utils import grab_info_by_state
 
 # https://towardsdatascience.com/create-your-first-rest-api-in-fastapi-e728ae649a60
 
-# TODO: ultima atualizacion de los datos!!
 
+API_VERSION = 1.0
 
 def _fetch_data():
     print("Reading vaccine information")
@@ -34,7 +34,7 @@ vaccine_reception = fetch_recepcion_de_vacunas()
 
 @app.get("/")
 def home():
-    return {"Hello": "FastAPI"}
+    return {"Greeting": "Hello! Go to /docs if you are lost :)"}
 
 
 @app.get("/vaccines/reception_qty")
@@ -119,6 +119,10 @@ def get_vaccines_by_date():
     return response
 
 
-@app.get("/greet/{name}")
-def say_hi(name: str):
-    return {"greeting": f"Hello, {name}"}
+@app.get("/version")
+def get_version():
+    """
+    Return the current version of the API.
+    Serves also as a "health" endpoint to make sure the API is up.
+    """
+    return {"version": f"{API_VERSION}"}
