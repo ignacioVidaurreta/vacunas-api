@@ -41,7 +41,16 @@ fig = px.choropleth(
     featureidkey="properties.c_indec",
     color="poblacion_vacunada_provincia",
     color_continuous_scale="Mint",
+    custom_data=[vac_df["poblacion_vacunada_provincia"]],
+    hover_data={
+        "jurisdiccion_codigo_indec": False,
+        "poblacion_vacunada_provincia": True,
+    },
+    # if you don't want to change column names
+    # you can just change them here
+    labels={"poblacion_vacunada_provincia": "Porcentaje Vacunados"},
 )
+
 fig.update_geos(
     showcountries=False,
     showcoastlines=False,
@@ -58,6 +67,7 @@ fig.update_layout(
     margin=dict(t=0, r=0, l=0),
     height=650,
     geo=dict(bgcolor="rgba(0,0,0,0)"),
+    hoverlabel=dict(font_size=14, font_family="Rockwell"),
 )
 
 ###############################
@@ -283,18 +293,8 @@ df4 = pd.DataFrame(
     columns=data4["header"],
 )
 
-data = {
-    "Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
-    "Total": [45, 65, 75, 73],
-    "Sputnik": [10, 20, 30, 30],
-    "Aztra": [10, 10, 15, 13],
-    "Sino": [20, 20, 23, 25],
-    "Shiel": [5, 15, 7, 10],
-}
 
-# df4 = pd.DataFrame(data)
 df4["fecha_aplicacion"] = df4[df4["fecha_aplicacion"] != "S.I."]
-#print(df4)
 
 fig4 = px.line(
     df4.sort_values(by="fecha_aplicacion"),
